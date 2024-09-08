@@ -1,0 +1,69 @@
+import './App.css';
+import React, { Component } from "react";
+
+class App extends Component {
+  constructor() {
+    super();
+    this.state = {
+      PocketMonster: [],
+      searchValue : "",
+    };
+    
+  }
+  
+  componentDidMount() {
+    fetch('https://pokeapi.co/api/v2/pokemon?limit=151')
+      .then((response) => response.json())
+      .then((data) => 
+        this.setState(
+          {
+            PocketMonster: data.results // accessing the results array from the API response
+          },
+          () => {
+            console.log(this.state);
+          }
+        )
+      )
+      .catch((error) => console.error('Error fetching data:', error));
+  }
+
+  onChangeSearch = (event) => {
+    const searchValue = event.target.value.toLocaleLowerCase()   
+    this.setState(()=>{
+      return {searchValue};
+    });            
+  };
+    
+  render() {
+    const { PocketMonster,searchValue } = this.state;
+    const { onChangeSearch } = this;
+    const filterPokemon = PocketMonster.filter((monster) =>{
+      return monster.name.toLocaleLowerCase().includes(searchValue);
+    });
+
+    return (
+      <div className="App">
+        <h1>Pocket Monsters</h1>
+        <div>
+          {/*search bar input*/}
+          <input type="search" className="search-bar-div" 
+            placeholder="search monster"
+            onChange= { onChangeSearch }
+          />
+        </div>
+        <div className="items-div">
+          {/*item list*/}
+          <h1>Pokedex</h1>
+          {filterPokemon.map((monster, index) =>(
+            <div key={index}>
+            {monster.name}
+            <br/>
+          </div>                    
+          ))}
+        </div>       
+      </div>
+    );
+  }
+}
+
+export default App;
